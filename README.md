@@ -1,4 +1,4 @@
-A full stack MERN app to for the following assignment:
+A full stack MERN app for the following assignment:
 
 Develop a task scheduler by integrating google Calendar API. You should be able to
 1. Authenticate to the platform using your google email address
