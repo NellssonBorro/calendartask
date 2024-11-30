@@ -8,10 +8,6 @@ let collection
 })()
 
 
-export const checkup = async (req, res, next) => {
-    res.status(200).json({result: "Fail", Verdict: "Repeat"});
-}
-
 export const signup = async (req, res, next) => {
 
     try {
@@ -41,14 +37,29 @@ export const signup = async (req, res, next) => {
 
         //insert this new user into the db
         const { insertedId } = await collection.insertOne(user)
-        //generate JWT token
-        const token = jwt.sign({ id: insertedId }, process.env.AUTH_SECRET)
-        //prepare the response object
-        user._id = insertedId
-        const { password: pass, updatedAt, createdAt, ...rest } = user;
-        res.cookie('taskytrack_token', token, { httpOnly: true })
-            .status(200).json(rest);
+        //send the response object
+        res.status(200);
     } catch (error) {
         next({ status: 500, error });
+    }
+}
+
+export const signin = async (req, res, next) => {
+    const {email, password} = req.body
+    try{
+        const validUser = await collection.findOne({email})
+        if(!validUser){
+            return next({status:404, message: 'User not found!'})
+        }
+        const validPassword = await bcryp.compare(password, validUser.password)
+        if(!validPassword){
+            return next({status: 401, message: 'Wrong password!'})
+        }
+        const token = jwt.sign({id: validUser._id}, process.env.AUTH_SECRET)
+        const { password: pass, updatedAt, createdAt, ...rest } = validUser;
+        res.cookie('taskytrack_user', token, { httpOnly: true })
+            .status(200).json(rest);
+    }catch(error){
+        next({status: 500, error})
     }
 }

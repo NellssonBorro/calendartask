@@ -20,12 +20,12 @@ export async function action({ request }) {
         });
         const data = await res.json();
         if(res.status == 200){
-            return { success: true, message: 'Sign Up Successful. You are now logged in', redirectTo:'/home' };
+            return { success: true, message: 'Sign Up Successful. Now you can log in', redirectTo:'/' };
         }else{
-            return{success: false, errors: data.errors || {}, message: data.message || 'Unknown error occurred', redirectTo:'/'}
+            return{success: false, errors: data.errors || {}, message: data.message || 'Unknown error occurred'};//, redirectTo:'/'}
         }
     }catch(error){
-        return {success: false, errors:{}, message: 'Something went wrong! '+error.message, redirectTo:'/'}
+        return {success: false, errors:{}, message: 'Something went wrong! '+error.message}//, redirectTo:'/'}
     }
 }
 
