@@ -3,10 +3,14 @@ import { ObjectId, ReturnDocument } from 'mongodb';
 
 const collection = await db.collection('users');
 
+export const checkme = async (req, res, next) => {
+    res.status(200).json({result: "Fail", Verdict: "Repeat"});
+}
+
 export const getUsers = async (req, res) =>{
     let results = await collection.find({}).toArray();
     res.status(200).json(results);
-};
+}; 
 
 export const getUser = async(req,res,next) =>{
     try{

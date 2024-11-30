@@ -5,12 +5,14 @@ import {
     getUser,
     updateUser,
     deleteUser,
+    checkme,
 } from '../controllers/user.controller.js';
 
-const router = express.Router();
-router.get('/all', getUsers);
-router.get('/:id', getUser);
-router.patch('/update/:id', updateUser);
-router.delete('/delete/:id', deleteUser);
+const userRouter = express.Router();
+userRouter.get('/all', getUsers);
+userRouter.get('/checkme', checkme);
+userRouter.get('/:id', getUser);
+userRouter.patch('/update/:id', updateUser);
+userRouter.delete('/delete/:id', deleteUser);
 
-export default router;
+export default userRouter;
