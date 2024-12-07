@@ -1,15 +1,16 @@
-import { Link, Form, redirect } from 'react-router-dom';
+import { Link, Form, replace, redirect } from 'react-router-dom';
 import toast from 'react-hot-toast';
 import { API_BASE_URL } from '../util';
-import { useNavigate, useActionData } from 'react-router-dom';
-import { useState } from 'react';
+import { useNavigate,useActionData } from 'react-router-dom';
+import { useEffect, useState } from 'react';
+import {useUser} from '../context/UserContext'
 
 export async function action({ request }) {
     const formData = await request.formData();
     const updates = Object.fromEntries(formData);
-    try {
-
-        const res = await fetch(`${API_BASE_URL}/checker/signin`, {
+    try{
+        
+        const res = await fetch(`${API_BASE_URL}/checker/signin`,{
             method: 'POST',
             headers: {
                 'Content-type': 'application/json',
@@ -17,43 +18,76 @@ export async function action({ request }) {
             credentials: 'include',
             body: JSON.stringify(updates),
         });
-        const rest = await res.json();
-        if (res.status == 200) {
-            toast.success("You have been logged in successfully!")
-            console.log("Debug message:", JSON.stringify(rest, null, 2));
-            return redirect('/home', { state: { userData: rest } })
-        } else {
-            toast.error("Incorrect login credentials!")           
+        const data = await res.json();
+        if(res.status == 200){ alert("out")
+            return redirect('/home',{
+                state: {
+                    success: true,
+                    data,
+                    message: 'You have been logged in successfully!',
+                },
+            })
+        }else{
+            alert("out 2")
+            return (
+                {
+                    success: false,
+                    errors: data.errors || {},
+                    message: data.message || 'Unknown error occurred',
+                })
         }
-    } catch (error) {
-        toast.error("An Unknown error occured: "+ error.message)
+    }catch(error){ 
+        return (
+            {
+                success: false,
+                errors:  {},
+                message:  'Something went wrong! '+error.message,
+            })
     }
 }
 
 
 export default function Signin() {
-    const [formData, setFormData] = useState({ email: '', password: '' })
+    const [formData, setFormData] = useState({ email: '', password: ''})
     const actionData = useActionData()
     const navigate = useNavigate()
+    const {updateUser} = useUser()
 
-    const handleSignOut = async () => {
-        try {
-
-            const res = await fetch(`${API_BASE_URL}/checker/signout`, {
+    const handleSignOut = async ()=>{
+        try{
+        
+            const res = await fetch(`${API_BASE_URL}/checker/signout`,{
                 credentials: 'include',
             });
             const message = await res.json();
             toast.success(message.message)
-            // updateUser(null)
+            updateUser(null)
             navigate('/')
-        } catch (error) {
+        }catch(error){
             toast.error(error)
-        }
+        }            
     }
 
     const handleChange = (e) => {
-        setFormData({ ...formData, [e.target.name]: e.target.value })
+        setFormData({...formData, [e.target.name]: e.target.value})
     }
+
+   useEffect(() =>{
+    if(actionData){
+
+        if(actionData.success){   alert("yes")
+            alert(actionData.success)
+            updateUser(actionData.data)   
+            if(actionData.redirectTo){alert()
+                navigate(actionData.redirectTo, {state: actionData}, {replace: true})
+            }   
+            // toast.success(actionData.message)
+        }else{alert("out 3")
+            alert(actionData.success)
+            toast.error(actionData.message)
+        }
+    }
+   }, [actionData, navigate, updateUser])
 
     return (
         <>
@@ -62,9 +96,9 @@ export default function Signin() {
                     TaskyTrack
                 </div>
                 <div className=" w-3/6 h-full mx-auto  md:w-3/6  ">
-
+                
                     <Form className=' bg-orange-200 p-4 rounded-xl shadow-xl shadow-slate-400 mt-3' method="post" id="signin-form">
-                        <div className="p-2 text-center underline "> Sign in </div>
+                <div className="p-2 text-center underline "> Sign in </div>
                         <label>
                             <span>Email</span>
                             <input
@@ -74,7 +108,7 @@ export default function Signin() {
                                 name="email"
                                 value={formData?.email || ""}
                                 onChange={handleChange}
-                                className='drop-shadow-xl w-full p-4 rounded-lg mb-2'
+                                className='drop-shadow-xl w-full p-4 rounded-lg mb-2'                     
                             />
                             <div>{actionData?.errors?.email && <p>Error: {actionData.errors.email}</p>}</div>
                         </label>
@@ -84,21 +118,21 @@ export default function Signin() {
                                 type="password"
                                 name="password"
                                 placeholder="password"
-                                value={formData?.password || ""}
+                                value={formData?.password  || ""}
                                 onChange={handleChange}
                                 className='drop-shadow-xl w-full p-4 rounded-lg mb-2'
-                            />
+                            />                            
                             <div>{actionData?.errors?.password && <p>Error: {actionData.errors.password}</p>}</div>
                         </label>
                         <p className='flex flex-row justify-between'>
                             <div className='flex flex-row space-x-2'>
-                                <button
-                                    className='px-4 py-3 rounded-lg bg-blue-300 hover:bg-blue-500'
-                                    type="submit"
-
-                                >Sign in</button>
-                                <button className='px-4 py-3 rounded-lg bg-red-300 hover:bg-red-500' type="reset">Cancel</button>
-                                <button className='px-4 py-3 rounded-lg bg-red-300 hover:bg-red-500' type="button" onClick={handleSignOut}>Out</button>
+                            <button 
+                            className='px-4 py-3 rounded-lg bg-blue-300 hover:bg-blue-500' 
+                            type="submit" 
+                            
+                            >Sign in</button>
+                            <button className='px-4 py-3 rounded-lg bg-red-300 hover:bg-red-500' type="reset">Cancel</button>
+                            <button className='px-4 py-3 rounded-lg bg-red-300 hover:bg-red-500' type="button" onClick={handleSignOut}>Out</button>
                             </div>
                         </p>
                     </Form>

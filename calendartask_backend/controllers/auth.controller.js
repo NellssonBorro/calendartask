@@ -50,8 +50,8 @@ export const signin = async (req, res, next) => {
         const validUser = await collection.findOne({email})
         if(!validUser){
             return next({status:404, message: 'User not found!'})
-        }
-        const validPassword = await bcryp.compare(password, validUser.password)
+        } 
+        const validPassword = await bcrypt.compare(password, validUser.password)
         if(!validPassword){
             return next({status: 401, message: 'Wrong password!'})
         }
@@ -61,5 +61,14 @@ export const signin = async (req, res, next) => {
             .status(200).json(rest);
     }catch(error){
         next({status: 500, error})
+    }
+}
+
+export const signout = async (req, res, next) => {
+    try{
+        res.clearCookie('taskytrack_user')
+        res.status(200).json({message: 'Signed out successful'})
+    }catch(error){
+        next({status: 500})
     }
 }

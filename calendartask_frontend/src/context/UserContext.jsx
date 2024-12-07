@@ -6,13 +6,13 @@ const UserContext = createContext()
 const UserProvider = props => {
     const [user, setUser] = useLocalStorage('taskytrack_user', null)//useState(null)
     
-    const updatedUser = user =>{
+    const updateUser = user =>{
         setUser(user)
     }
 
     const value = {
         user,
-        updatedUser,
+        updateUser,
     }
 
     return (
