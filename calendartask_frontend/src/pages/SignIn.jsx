@@ -6,7 +6,9 @@ import { useState } from 'react';
 
 export async function action({ request }) {
     const formData = await request.formData();
-    const updates = Object.fromEntries(formData);
+    const updates = Object.fromEntries(formData);    
+    // const navigate = useNavigate();
+    
     try {
 
         const res = await fetch(`${API_BASE_URL}/checker/signin`, {
@@ -21,12 +23,23 @@ export async function action({ request }) {
         if (res.status == 200) {
             toast.success("You have been logged in successfully!")
             console.log("Debug message:", JSON.stringify(rest, null, 2));
-            return redirect('/home', { state: { userData: rest } })
+            sessionStorage.setItem('userData', JSON.stringify(rest))
+            return redirect('/home')
+            // navigate('/home', { state: { userData: rest } })
         } else {
             toast.error("Incorrect login credentials!")           
         }
     } catch (error) {
         toast.error("An Unknown error occured: "+ error.message)
+        //for no internet
+        const rest = {
+            username: "nelly",
+            _id: "nb001",
+            email: "nelly@test.com",
+            avatar: "https://avatarhub/free/nellyface.png"
+        }
+        sessionStorage.setItem('userData', JSON.stringify(rest))
+            return redirect('/home')
     }
 }
 

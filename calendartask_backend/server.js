@@ -2,6 +2,7 @@ import express from 'express';
 import 'dotenv/config';
 import userRouter from './routes/user.route.js';
 import authRouter from './routes/auth.route.js';
+import taskRouter from './routes/task.route.js';
 import { errorHandler } from './libs/middleware.js';
 import cookieParser from 'cookie-parser';
 import cors from 'cors'
@@ -19,6 +20,7 @@ app.use(cors({
 }));
 
 app.use('/api/v1/users', userRouter);
+app.use('/api/v1/tasks', taskRouter);
 app.use('/api/v1/checker', authRouter);
 app.use('*', (req, res) => {
     res.status(404).json({message: 'Not Found!'});

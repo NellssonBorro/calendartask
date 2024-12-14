@@ -4,13 +4,62 @@ import Task from './task';
 // import {useUser} from '../context/UserContext'
 // import toast from 'react-hot-toast';
 // import { useEffect } from 'react';
+import { Form, useLoaderData } from "react-router-dom";
+import { API_BASE_URL } from '../util';
+import toast from 'react-hot-toast';
 
+// export async function loader({ params }) {    
+//     // const userData = JSON.parse(sessionStorage.getItem('userData') || '{}')
+//     // alert(userData._id)
+//     // console.log("Debug userData:",userData._id);
+//     try {
+//         const res = await fetch(`${API_BASE_URL}/tasks/all/${userData._id}`, {
+//             method: 'GET',
+//             headers: {
+//                 'Content-type': 'application/json',
+//             },
+//         });
+//         const tasks = await res.json();
+//         if (res.status == 200) {
+//             return { tasks }
+//         } else {
+//             toast.error("Could not load your tasks!")
+//         }
+//     } catch (error) {
+//         toast.error("An Unknown error occured: " + error.message)
+//     }
+//     return { tasks: [] }; // Default to an empty array if tasks cannot be fetched
+// }
 
 export default function Home() {
-    // alert("homeeee")
+    // const {tasks} = useLoaderData();
+
+   
+    
     // const {updateUser} = useUser()
     const location = useLocation()
-    const userData = location.state?.userData
+    // const userData = location.state?.userData
+    // const userData =  sessionStorage.getItem('userData') || '{}'
+    const userData = JSON.parse(sessionStorage.getItem('userData') || '{}')
+    var tasks = null
+    try {
+                const res =  fetch(`${API_BASE_URL}/tasks/all/${userData._id}`, {
+                    method: 'GET',
+                    headers: {
+                        'Content-type': 'application/json',
+                    },
+                });
+                tasks =  res.json();
+                if (res.status == 200) {
+                    return { tasks }
+                } else {
+                    toast.error("Could not load your tasks!")
+                }
+            } catch (error) {
+                toast.error("An Unknown error occured: " + error.message)
+            }
+
+
 
     console.log("Location state:", location.state);
 
@@ -34,8 +83,8 @@ export default function Home() {
                             <img src="../../account_circle.png" alt="G" />
                         </div>
                         <div className="flex flex-col justify-center">
-                            <div>User One Name</div>
-                            <div>userone@email.com</div>
+                            <div className='font-bold'>{userData.username}</div>
+                            <div className='italic'>{userData.email}</div>
                         </div>
                     </div>
                     <div className="flex flex-col justify-center text-red-900 font-extrabold  text-center  ">
@@ -54,15 +103,27 @@ export default function Home() {
                                 defaultValue=""
                             />
                         </div>
-                        <div className='' >
-                            <Task />
+                        <div className='flex flex-col gap-1' >
+                            {/* {
+                                userData.map((item) => (
+                                    <Task key={item._id} task={item} />
+                                ))
+                            } */}
+                            {/* <Task task={userData} /> */}
+                            {
+                                tasks?.map((item) => (
+                                    <Task key={item._id} task={item} />
+                                ))
+                            }
+                            {/* <Task task={task}/> */}
                         </div>
                     </div>
                     <div className=" bg-yellow-100 basis-7/12 ">
-                        {/* <div>{userData.username}</ div>
+                        {/* <div>{JSON.stringify(tasks, null, 2)}</div> */}
+                        <div>{userData.username}</ div>
                         <div>{userData._id}</div>
                         <div>{userData.email}</div>
-                        <div>{userData.avatar}</div> */}
+                        <div>{userData.avatar}</div>
                         <div>{JSON.stringify(userData, null, 2)}</div>
                     </div>
                 </div>
